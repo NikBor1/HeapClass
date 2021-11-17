@@ -11,27 +11,29 @@ public:
     Heap(std::vector <int> bod);
 
     int get_value(){return value;}
-    int get_body(){return body;}
+    std::vector <int>  get_body(){return body;}
 
     void set_value(int val){value = val;}
 
-    void siftUp(int ID);
-    void siftDown(int ID);
+    int siftUp(int ID);
+    int siftDown(int ID);
 
-    void add(int newElem);
+    int add(int newElem);
 
-    void takeFirst();
+    int takeFirst();
 
-    void changePriority(int ID, int newPrior);
+    int changePriority(int ID, int newPrior);
 
     void postCreatedSorting();
+
+    void printHeap();
 
 };
 
 Heap::Heap()
 {
     value = 0;
-    std:vector <int> bod (0);
+    std::vector <int> bod (0);
     body = bod;
 }
 
@@ -41,32 +43,47 @@ Heap::Heap(std::vector <int> bod)
     body = bod;
 }
 
-void Heap::siftUp(int ID)
+int Heap::siftUp(int ID)
 {
     int IDnow = ID;
 
     while(IDnow > 0 && body[IDnow] > body[(IDnow - 1) / 2]);
+    {
         std::swap(body[IDnow], body[(IDnow - 1) / 2]);
+        IDnow = (IDnow - 1) / 2;
+    }
+
+
+    return IDnow;
 
 }
 
-void Heap::siftDown(int ID)
+int Heap::siftDown(int ID)
 {
     int IDnow = ID;
 
-    for(int i = 0; i > -1; i ++);
+    for(int i = 0; i > -1; i ++)
     {
         if(IDnow >= value / 2)
             break;
 
         if(value % 2 == 1 || IDnow < (value - 1) / 2)
         {
-            if(body[IDnow] < body[2 * IDnow + 1] || body[IDnow] < body[2 * IDnow + 2]);
+            if(body[IDnow] < body[2 * IDnow + 1] || body[IDnow] < body[2 * IDnow + 2])
             {
                 if(body[2 * IDnow + 1] >= body[2 * IDnow + 2])
+                {
                     std::swap(body[2 * IDnow + 1], body[IDnow]);
+                    IDnow = 2 * IDnow + 1;
+                }
+
                 else
+                {
                     std::swap(body[2 * IDnow + 2], body[IDnow]);
+                    IDnow = 2 * IDnow + 2;
+                }
+
+
             }
             else
                 break;
@@ -74,16 +91,20 @@ void Heap::siftDown(int ID)
         else
         {
             if(body[IDnow] < body[2 * IDnow + 1])
+            {
                 std::swap(body[2 * IDnow + 1], body[IDnow]);
+                IDnow = 2 * IDnow + 1;
+            }
             else
                 break;
         }
     }
 
+    return IDnow;
 }
 
 
-void Heap::add(int newElem)
+int Heap::add(int newElem)
 {
     value ++;
 
@@ -92,23 +113,36 @@ void Heap::add(int newElem)
     else
         body[value - 1] = newElem;
 
-    siftUp(value - 1);
+    return siftUp(value - 1);
 }
 
-void Heap::takeFirst()
+int Heap::takeFirst()
 {
     value --;
     std::swap(body[0], body[value]);
 
-    siftDown(0);
+    return siftDown(0);
 }
 
-void Heap::changePriority(int ID, int newPrior)
+int Heap::changePriority(int ID, int newPrior)
 {
     body[ID] = newPrior;
 
-    siftUp(ID);
-    siftDown(ID);
+    int u, d;
+
+    u = siftUp(ID);
+    d = siftDown(ID);
+
+    if(u == ID && d != ID)
+        return d;
+
+    if(d == ID && u != ID)
+        return u;
+
+    if(u == ID && d == ID)
+        return ID;
+
+    return -1;
 }
 
 void Heap::postCreatedSorting()
@@ -117,9 +151,47 @@ void Heap::postCreatedSorting()
         siftDown(i);
 }
 
+void Heap::printHeap()
+{
+    for(int i = 0; i < value; i ++)
+        std::cout << body[i] << " ";
+}
+
 
 int main()
 {
+    std::vector <int> withHeap;
+
+    int n;
+
+    std::cin >> n;
+
+    for(int i = 0; i < n; i ++)
+    {
+        int a;
+        std::cin >> a;
+        withHeap.push_back(a);
+    }
+
+    Heap workSpace(withHeap);
+
+    int reqs;
+
+    std::cin >> reqs;
+
+    for(int i = 0; i < reqs; i ++)
+    {
+
+        int index, priorityDelta;
+        std::cin >> index >> priorityDelta;
+
+        std::cout << workSpace.changePriority(index - 1, workSpace.get_body()[index - 1] + priorityDelta);
+
+    }
+
+    workSpace.printHeap();
+
+
 
 
     return 0;
